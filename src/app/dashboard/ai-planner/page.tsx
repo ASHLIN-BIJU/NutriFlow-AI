@@ -1,0 +1,213 @@
+"use client";
+
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Send, Bot, User, ChefHat, Sparkles, ShoppingBag, RotateCcw, Edit2, Save } from "lucide-react";
+
+type MealPlan = {
+  breakfast: { items: string; protein: string; calories: string; cost: string; restaurant: string; };
+  lunch: { items: string; protein: string; calories: string; cost: string; restaurant: string; };
+  dinner: { items: string; protein: string; calories: string; cost: string; restaurant: string; };
+  total: { calories: string; protein: string; cost: string; };
+} | null;
+
+type Message = {
+  role: string;
+  content: string;
+  plan: MealPlan;
+};
+
+export default function AIPlannerPage() {
+  const [prompt, setPrompt] = useState("");
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      role: "ai",
+      content: "Hi! I'm your NutriFlow AI assistant. Tell me your food goals, budget, and preferences, and I'll create the perfect meal plan from restaurants near you.",
+      plan: null
+    }
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const examplePrompts = [
+    "150g protein under ₹400",
+    "Vegetarian fat loss plan",
+    "Keto diet for a week",
+    "Budget hostel meal plan"
+  ];
+
+  const handleSend = () => {
+    if (!prompt.trim()) return;
+    
+    // Add user message
+    const userMsg = { role: "user", content: prompt, plan: null };
+    setMessages(prev => [...prev, userMsg]);
+    setPrompt("");
+    setIsLoading(true);
+
+    // Simulate AI response
+    setTimeout(() => {
+      setMessages(prev => [...prev, {
+        role: "ai",
+        content: "Here is a highly optimized meal plan based on your request, leveraging the best options on Swiggy right now.",
+        plan: {
+          breakfast: { items: "High Protein Oats & Scrambled Eggs", protein: "25g", calories: "350", cost: "₹80", restaurant: "Healthy Bowls" },
+          lunch: { items: "Grilled Chicken Breast with Quinoa", protein: "45g", calories: "550", cost: "₹180", restaurant: "Fit Kitchen" },
+          dinner: { items: "Paneer Tikka Salad", protein: "20g", calories: "300", cost: "₹130", restaurant: "Green Leaf" },
+          total: { calories: "1200 kcal", protein: "90g", cost: "₹390" }
+        }
+      }]);
+      setIsLoading(false);
+    }, 2000);
+  };
+
+  return (
+    <div className="flex flex-col h-full max-w-5xl mx-auto bg-[#0A0A0A]">
+      {/* Header */}
+      <div className="pb-6 mb-6 border-b border-white/5 flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-1">AI Nutrition Planner</h1>
+          <p className="text-gray-400 text-sm">Design your perfect meal plan via Swiggy</p>
+        </div>
+        <div className="glass px-4 py-2 rounded-xl flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-[#FF6B00]" />
+          <span className="text-sm font-medium">GPT-4o Powered</span>
+        </div>
+      </div>
+
+      {/* Chat Area */}
+      <div className="flex-1 overflow-y-auto mb-6 pr-2 space-y-6 scrollbar-hide">
+        {messages.map((msg, i) => (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            key={i} 
+            className={`flex gap-4 max-w-[85%] ${msg.role === 'user' ? 'ml-auto flex-row-reverse' : ''}`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex-shrink-0 flex items-center justify-center ${
+              msg.role === 'user' ? 'bg-white/10' : 'bg-gradient-to-br from-[#FF6B00] to-[#FF7A1A]'
+            }`}>
+              {msg.role === 'user' ? <User className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-white" />}
+            </div>
+            
+            <div className={`flex flex-col gap-3 ${msg.role === 'user' ? 'items-end' : ''}`}>
+              <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
+                msg.role === 'user' ? 'bg-[#FF6B00] text-white rounded-tr-sm' : 'glass rounded-tl-sm text-gray-200'
+              }`}>
+                {msg.content}
+              </div>
+
+              {msg.plan && (
+                <div className="glass-orange p-6 rounded-2xl w-full md:min-w-[500px]">
+                  <div className="flex items-center gap-2 mb-6 text-[#FF6B00]">
+                    <ChefHat className="w-5 h-5" />
+                    <h3 className="font-semibold">Recommended Meal Plan</h3>
+                  </div>
+
+                  <div className="space-y-4 mb-6">
+                    {['breakfast', 'lunch', 'dinner'].map((mealTime) => (
+                      <div key={mealTime} className="bg-[#121212] p-4 rounded-xl border border-white/5">
+                        <div className="flex justify-between items-start mb-2">
+                          <h4 className="font-medium text-white capitalize">{mealTime}</h4>
+                          <span className="text-[#FF6B00] font-bold text-sm">{(msg.plan as any)[mealTime].cost}</span>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-3">{(msg.plan as any)[mealTime].items}</p>
+                        <div className="flex gap-4 text-xs font-mono text-gray-500">
+                          <span className="bg-white/5 px-2 py-1 rounded">{(msg.plan as any)[mealTime].calories} kcal</span>
+                          <span className="bg-white/5 px-2 py-1 rounded">{(msg.plan as any)[mealTime].protein} protein</span>
+                          <span className="bg-white/5 px-2 py-1 rounded">via {(msg.plan as any)[mealTime].restaurant}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex justify-between items-center p-4 bg-[#0A0A0A] rounded-xl border border-white/10 mb-6">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 mb-1">Total Calories</p>
+                      <p className="font-bold text-white">{msg.plan.total.calories}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 mb-1">Total Protein</p>
+                      <p className="font-bold text-blue-400">{msg.plan.total.protein}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 mb-1">Daily Budget</p>
+                      <p className="font-bold text-green-400">{msg.plan.total.cost}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <button className="flex-1 bg-white text-black font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
+                      <ShoppingBag className="w-4 h-4" />
+                      Order via Swiggy
+                    </button>
+                    <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors tooltip tooltip-top" data-tip="Save Plan">
+                      <Save className="w-4 h-4 text-gray-300" />
+                    </button>
+                    <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors tooltip tooltip-top" data-tip="Edit">
+                      <Edit2 className="w-4 h-4 text-gray-300" />
+                    </button>
+                    <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors tooltip tooltip-top" data-tip="Regenerate">
+                      <RotateCcw className="w-4 h-4 text-gray-300" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        ))}
+
+        {isLoading && (
+          <div className="flex gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FF6B00] to-[#FF7A1A] flex items-center justify-center">
+              <Bot className="w-5 h-5 text-white" />
+            </div>
+            <div className="glass p-4 rounded-2xl rounded-tl-sm flex items-center gap-2">
+              <span className="w-2 h-2 bg-[#FF6B00] rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-2 h-2 bg-[#FF6B00] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-2 h-2 bg-[#FF6B00] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Input Area */}
+      <div className="mt-auto">
+        <div className="flex gap-2 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+          {examplePrompts.map((p, i) => (
+            <button 
+              key={i}
+              onClick={() => setPrompt(p)}
+              className="whitespace-nowrap px-4 py-2 rounded-full text-xs font-medium bg-white/5 hover:bg-white/10 border border-white/5 transition-colors text-gray-400 hover:text-white"
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+        
+        <div className="relative">
+          <div className="absolute -inset-1 bg-gradient-to-r from-[#FF6B00]/20 to-[#FF7A1A]/20 rounded-2xl blur-lg pointer-events-none" />
+          <div className="relative flex items-center bg-[#121212] rounded-2xl border border-white/10 p-2 pl-4">
+            <input 
+              type="text" 
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+              placeholder="Describe your food goals..." 
+              className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-600 h-12 text-sm"
+            />
+            <button 
+              onClick={handleSend}
+              className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
+                prompt.trim() 
+                  ? "bg-[#FF6B00] text-white hover:bg-[#FF7A1A]" 
+                  : "bg-white/5 text-gray-600 cursor-not-allowed"
+              }`}
+            >
+              <Send className="w-5 h-5 ml-1" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
