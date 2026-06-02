@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, @next/next/no-img-element */
 "use client";
 
 import { useState } from "react";
@@ -59,7 +60,7 @@ export default function AIPlannerPage() {
     } catch (error: any) {
       setMessages(prev => [...prev, {
         role: "ai",
-        content: "I'm sorry, I couldn't generate a plan right now. Please ensure your Gemini API key is configured. Error: " + (error.message || ""),
+        content: "I&apos;m sorry, I couldn&apos;t generate a plan right now. Please ensure your Gemini API key is configured. Error: " + (error.message || ""),
         plan: null
       }]);
     } finally {

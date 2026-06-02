@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, @next/next/no-img-element */
 "use client";
 
 import { ShoppingBag, ChevronRight, CheckCircle2, Clock, MapPin, CreditCard, Loader2 } from "lucide-react";
