@@ -1,36 +1,76 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🥗 NutriFlow AI
 
-## Getting Started
+> Your intelligent nutrition agent powered by Gemini AI and integrated with Swiggy.
 
-First, run the development server:
+![NutriFlow AI Hero](./public/screenshots/hero.png)
+
+NutriFlow AI is a modern, high-conversion SaaS platform that takes your dietary goals (macros, budget, preferences) and uses Google's Gemini AI to instantly generate optimized daily meal plans, complete with restaurant recommendations and cost breakdowns.
+
+## ✨ Features
+
+- **🧠 Intelligent Meal Planning**: Tell the AI your budget and macro goals (e.g., "150g protein under ₹400") and get a complete breakfast, lunch, and dinner plan.
+- **🔐 Secure Authentication**: Full email/password authentication and protected routes powered by Supabase Auth.
+- **⚡ Real-time AI Generation**: Lightning-fast structured JSON parsing powered by Google Generative AI (`gemini-flash-latest`).
+- **🎨 Premium Dark UI**: Stunning, glassmorphism-inspired dark mode interface built with Tailwind CSS and Framer Motion.
+- **📱 Fully Responsive**: Flawless experience across desktop, tablet, and mobile devices.
+
+## 📸 Screenshots
+
+| Landing Page | AI Planner Dashboard |
+|--------------|----------------------|
+| ![Landing](./public/screenshots/landing.png) | ![Dashboard](./public/screenshots/dashboard.png) |
+
+*(Note: Create a `public/screenshots` folder and add `hero.png`, `landing.png`, and `dashboard.png` to display your app's actual images here!)*
+
+## 🚀 Quick Start Guide
+
+Follow these steps to set up the project locally.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/yourusername/nutriflow-ai.git
+cd nutriflow-ai
+```
+
+### 2. Install dependencies
+
+```bash
+npm install
+```
+
+### 3. Set up Environment Variables
+
+Create a `.env.local` file in the root directory and add your API keys:
+
+```env
+# Supabase Configuration
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+# Google AI Studio Configuration
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+*Note: For local testing, ensure Email Confirmation is disabled in your Supabase Auth settings to bypass the free-tier email limit.*
+
+### 4. Run the Development Server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🛠️ Tech Stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Styling**: [Tailwind CSS](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Authentication**: [Supabase](https://supabase.com/)
+- **AI**: [Google Generative AI SDK (Gemini)](https://ai.google.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/)
 
-## Learn More
+## 📝 License
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This project is licensed under the MIT License.
