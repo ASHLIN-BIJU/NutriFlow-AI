@@ -7,11 +7,7 @@ import { motion } from "framer-motion";
 const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const dates = [12, 13, 14, 15, 16, 17, 18];
 
-const mealPlan = {
-  breakfast: { name: "Oatmeal & Protein Shake", cals: 450, pro: 35, cost: "₹120", ordered: true },
-  lunch: { name: "Chicken Quinoa Bowl", cals: 650, pro: 55, cost: "₹250", ordered: true },
-  dinner: { name: "Grilled Salmon Salad", cals: 500, pro: 45, cost: "₹300", ordered: false },
-};
+const mealPlan: Record<string, any> = {};
 
 export default function MealPlansPage() {
   const [activeDay, setActiveDay] = useState(2); // Wednesday (index 2)
@@ -65,50 +61,60 @@ export default function MealPlansPage() {
       <div className="grid md:grid-cols-3 gap-8 flex-1">
         {/* Meals Column */}
         <div className="md:col-span-2 space-y-6">
-          {Object.entries(mealPlan).map(([mealType, details], i) => (
-            <motion.div 
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              key={mealType} 
-              className="glass p-6 rounded-3xl group hover:border-white/20 transition-all"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold capitalize text-white">{mealType}</h3>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium text-gray-400">Status:</span>
-                  {details.ordered ? (
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-green-400 bg-green-400/10 px-3 py-1.5 rounded-full">
-                      <CheckCircle2 className="w-4 h-4" /> Ordered
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1.5 text-xs font-bold text-yellow-400 bg-yellow-400/10 px-3 py-1.5 rounded-full">
-                      <Circle className="w-4 h-4" /> Pending
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="bg-[#121212] p-4 rounded-2xl border border-white/5 flex items-center justify-between">
-                <div>
-                  <h4 className="font-semibold text-lg text-gray-200 mb-1">{details.name}</h4>
-                  <div className="flex items-center gap-4 text-sm font-medium text-gray-500">
-                    <span>{details.cals} kcal</span>
-                    <span className="w-1 h-1 bg-gray-600 rounded-full" />
-                    <span className="text-blue-400">{details.pro}g Protein</span>
+          {Object.keys(mealPlan).length === 0 ? (
+            <div className="glass p-12 rounded-3xl text-center flex flex-col items-center justify-center">
+              <CalendarIcon className="w-12 h-12 text-gray-500 mb-4" />
+              <h3 className="text-xl font-bold text-white mb-2">No Meals Planned</h3>
+              <p className="text-gray-400 max-w-sm mx-auto">
+                You haven't generated a meal plan for this day yet. Head over to the AI Planner to create your custom schedule.
+              </p>
+            </div>
+          ) : (
+            Object.entries(mealPlan).map(([mealType, details], i) => (
+              <motion.div 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                key={mealType} 
+                className="glass p-6 rounded-3xl group hover:border-white/20 transition-all"
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-bold capitalize text-white">{mealType}</h3>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-gray-400">Status:</span>
+                    {details.ordered ? (
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-green-400 bg-green-400/10 px-3 py-1.5 rounded-full">
+                        <CheckCircle2 className="w-4 h-4" /> Ordered
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1.5 text-xs font-bold text-yellow-400 bg-yellow-400/10 px-3 py-1.5 rounded-full">
+                        <Circle className="w-4 h-4" /> Pending
+                      </span>
+                    )}
                   </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-xl font-bold text-[#FF6B00] block mb-2">{details.cost}</span>
-                  {!details.ordered && (
-                    <button className="text-sm bg-white text-black px-4 py-1.5 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
-                      Order Now
-                    </button>
-                  )}
+
+                <div className="bg-[#121212] p-4 rounded-2xl border border-white/5 flex items-center justify-between">
+                  <div>
+                    <h4 className="font-semibold text-lg text-gray-200 mb-1">{details.name}</h4>
+                    <div className="flex items-center gap-4 text-sm font-medium text-gray-500">
+                      <span>{details.cals} kcal</span>
+                      <span className="w-1 h-1 bg-gray-600 rounded-full" />
+                      <span className="text-blue-400">{details.pro}g Protein</span>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <span className="text-xl font-bold text-[#FF6B00] block mb-2">{details.cost}</span>
+                    {!details.ordered && (
+                      <button className="text-sm bg-white text-black px-4 py-1.5 rounded-lg font-semibold hover:bg-gray-200 transition-colors">
+                        Order Now
+                      </button>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))
+          )}
         </div>
 
         {/* Daily Summary Column */}
@@ -120,30 +126,30 @@ export default function MealPlansPage() {
               <div>
                 <div className="flex justify-between text-sm font-medium mb-2">
                   <span className="text-gray-300">Calories</span>
-                  <span className="text-white">1,600 / 2,000 kcal</span>
+                  <span className="text-white">0 / 2,000 kcal</span>
                 </div>
                 <div className="w-full bg-black/40 rounded-full h-2">
-                  <div className="bg-[#FF6B00] h-full rounded-full" style={{ width: '80%' }} />
+                  <div className="bg-[#FF6B00] h-full rounded-full" style={{ width: '0%' }} />
                 </div>
               </div>
               
               <div>
                 <div className="flex justify-between text-sm font-medium mb-2">
                   <span className="text-gray-300">Protein</span>
-                  <span className="text-white">135g / 150g</span>
+                  <span className="text-white">0g / 150g</span>
                 </div>
                 <div className="w-full bg-black/40 rounded-full h-2">
-                  <div className="bg-blue-500 h-full rounded-full" style={{ width: '90%' }} />
+                  <div className="bg-blue-500 h-full rounded-full" style={{ width: '0%' }} />
                 </div>
               </div>
 
               <div>
                 <div className="flex justify-between text-sm font-medium mb-2">
                   <span className="text-gray-300">Daily Budget</span>
-                  <span className="text-white">₹670 / ₹800</span>
+                  <span className="text-white">₹0 / ₹800</span>
                 </div>
                 <div className="w-full bg-black/40 rounded-full h-2">
-                  <div className="bg-green-500 h-full rounded-full" style={{ width: '83%' }} />
+                  <div className="bg-green-500 h-full rounded-full" style={{ width: '0%' }} />
                 </div>
               </div>
             </div>

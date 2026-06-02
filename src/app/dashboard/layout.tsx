@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { LayoutDashboard, Calendar, ShoppingBag, PieChart, Settings, ChefHat, LogOut } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { LayoutDashboard, Calendar, ShoppingBag, PieChart, Settings, ChefHat, LogOut, MapPin } from "lucide-react";
+import { createClient } from "@/utils/supabase/client";
 
 export default function DashboardLayout({
   children,
@@ -10,6 +11,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const supabase = createClient();
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   const navItems = [
     { name: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
@@ -53,7 +61,10 @@ export default function DashboardLayout({
         </nav>
 
         <div className="p-4 border-t border-white/5">
-          <button className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-left">
+          <button 
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-4 py-3 rounded-xl w-full text-gray-400 hover:text-white hover:bg-white/5 transition-all text-left"
+          >
             <LogOut className="w-5 h-5" />
             Logout
           </button>
@@ -63,8 +74,14 @@ export default function DashboardLayout({
       {/* Main Content */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="h-20 border-b border-white/5 flex items-center justify-between px-8 bg-[#0A0A0A]/50 backdrop-blur-xl">
-          <div className="text-xl font-semibold text-white">
-            NutriFlow Workspace
+          <div>
+            <div className="text-xl font-semibold text-white">
+              NutriFlow Workspace
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-0.5">
+              <MapPin className="w-3.5 h-3.5" />
+              <span>Hostel Block A, Room 304, Campus</span>
+            </div>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/dashboard/ai-planner">

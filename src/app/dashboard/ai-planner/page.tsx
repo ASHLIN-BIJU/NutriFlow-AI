@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Send, Bot, User, ChefHat, Sparkles, ShoppingBag, RotateCcw, Edit2, Save } from "lucide-react";
+import { Send, Bot, User, ChefHat, Sparkles, ShoppingBag, RotateCcw, Edit2, Save, ArrowRight } from "lucide-react";
 
 type MealPlan = {
   breakfast: { items: string; protein: string; calories: string; cost: string; restaurant: string; };
@@ -19,13 +19,7 @@ type Message = {
 
 export default function AIPlannerPage() {
   const [prompt, setPrompt] = useState("");
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      role: "ai",
-      content: "Hi! I'm your NutriFlow AI assistant. Tell me your food goals, budget, and preferences, and I'll create the perfect meal plan from restaurants near you.",
-      plan: null
-    }
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   const examplePrompts = [
@@ -35,7 +29,7 @@ export default function AIPlannerPage() {
     "Budget hostel meal plan"
   ];
 
-  const handleSend = () => {
+  const handleSend = async () => {
     if (!prompt.trim()) return;
     
     // Add user message
@@ -44,21 +38,96 @@ export default function AIPlannerPage() {
     setPrompt("");
     setIsLoading(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to generate plan");
+      }
+
       setMessages(prev => [...prev, {
         role: "ai",
-        content: "Here is a highly optimized meal plan based on your request, leveraging the best options on Swiggy right now.",
-        plan: {
-          breakfast: { items: "High Protein Oats & Scrambled Eggs", protein: "25g", calories: "350", cost: "₹80", restaurant: "Healthy Bowls" },
-          lunch: { items: "Grilled Chicken Breast with Quinoa", protein: "45g", calories: "550", cost: "₹180", restaurant: "Fit Kitchen" },
-          dinner: { items: "Paneer Tikka Salad", protein: "20g", calories: "300", cost: "₹130", restaurant: "Green Leaf" },
-          total: { calories: "1200 kcal", protein: "90g", cost: "₹390" }
-        }
+        content: data.message,
+        plan: data.plan
       }]);
+    } catch (error: any) {
+      setMessages(prev => [...prev, {
+        role: "ai",
+        content: "I'm sorry, I couldn't generate a plan right now. Please ensure your Gemini API key is configured. Error: " + (error.message || ""),
+        plan: null
+      }]);
+    } finally {
       setIsLoading(false);
-    }, 2000);
+    }
   };
+
+  if (messages.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full max-w-4xl mx-auto text-center relative">
+        {/* Background gradients */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[#FF6B00] opacity-10 blur-[120px] rounded-full pointer-events-none" />
+        
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="relative z-10 w-full"
+        >
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 mb-8 text-sm font-medium text-[#FF7A1A]">
+            <Sparkles className="w-4 h-4" />
+            <span>Powered by Swiggy AI Integrations</span>
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-sans text-white">
+            Your AI <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#FF6B00] to-[#FF9B44]">Nutrition</span> Agent
+          </h1>
+          
+          <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Tell us your goals. We'll plan, optimize, and order your meals automatically using the best restaurants near you.
+          </p>
+
+          <div className="max-w-2xl mx-auto mb-8 relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-[#FF6B00] to-[#FF7A1A] rounded-2xl blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200" />
+            <div className="relative flex items-center bg-[#121212] rounded-2xl border border-white/10 p-2 pl-6">
+              <input 
+                type="text" 
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+                placeholder="I need 100g protein daily under ₹250..." 
+                className="flex-1 bg-transparent border-none outline-none text-lg text-white placeholder-gray-500 h-14"
+              />
+              <button 
+                onClick={handleSend}
+                disabled={isLoading}
+                className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FF7A1A] text-white font-semibold flex items-center justify-center gap-2 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <>Generate <ArrowRight className="w-5 h-5" /></>}
+              </button>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-3">
+            {examplePrompts.map((p, i) => (
+              <button 
+                key={i}
+                onClick={() => setPrompt(p)}
+                className="px-4 py-2 rounded-full text-sm bg-white/5 hover:bg-white/10 border border-white/5 transition-colors text-gray-300"
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full max-w-5xl mx-auto bg-[#0A0A0A]">

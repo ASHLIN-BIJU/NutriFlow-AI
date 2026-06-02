@@ -49,28 +49,9 @@ export default function OrdersPage() {
               <h2 className="text-xl font-bold text-white mb-6">Today's Scheduled Deliveries</h2>
               
               <div className="space-y-4">
-                {[
-                  { rest: "Fit Bowl Co.", time: "Lunch • 1:00 PM", name: "Grilled Chicken Salad", cals: "450 kcal", pro: "40g", price: "₹240" },
-                  { rest: "Protein Hub", time: "Dinner • 8:00 PM", name: "Paneer Tikka & Quinoa", cals: "500 kcal", pro: "35g", price: "₹280" },
-                ].map((item, i) => (
-                  <div key={i} className="flex gap-4 bg-[#121212] p-4 rounded-2xl border border-white/5">
-                    <div className="w-16 h-16 rounded-xl bg-white/5 flex items-center justify-center flex-shrink-0">
-                      <ShoppingBag className="w-6 h-6 text-gray-500" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-xs text-[#FF6B00] font-bold mb-1 uppercase tracking-wider">{item.time}</p>
-                      <h3 className="font-semibold text-white mb-1">{item.name}</h3>
-                      <p className="text-sm text-gray-400">from {item.rest}</p>
-                      <div className="flex items-center gap-3 mt-3 text-xs font-mono text-gray-500">
-                        <span className="bg-white/5 px-2 py-1 rounded">{item.cals}</span>
-                        <span className="bg-white/5 px-2 py-1 rounded">{item.pro}</span>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-white">{item.price}</p>
-                    </div>
-                  </div>
-                ))}
+                <div className="p-4 text-center text-sm text-gray-500 bg-white/5 rounded-2xl border border-dashed border-white/10">
+                  No scheduled deliveries for today.
+                </div>
               </div>
             </div>
 
@@ -147,15 +128,15 @@ export default function OrdersPage() {
             
             <div className="glass p-6 rounded-3xl text-center">
               <h3 className="font-semibold text-white mb-2">Macro Impact</h3>
-              <p className="text-sm text-gray-400 mb-4">This order fulfills your remaining daily goals.</p>
+              <p className="text-sm text-gray-400 mb-4">No order selected.</p>
               <div className="flex justify-center gap-4 text-sm font-medium">
                 <div className="flex flex-col items-center">
-                  <span className="text-[#FF6B00]">950</span>
+                  <span className="text-[#FF6B00]">0</span>
                   <span className="text-gray-500 text-xs">kcal</span>
                 </div>
                 <div className="w-[1px] h-8 bg-white/10" />
                 <div className="flex flex-col items-center">
-                  <span className="text-blue-400">75g</span>
+                  <span className="text-blue-400">0g</span>
                   <span className="text-gray-500 text-xs">Protein</span>
                 </div>
               </div>

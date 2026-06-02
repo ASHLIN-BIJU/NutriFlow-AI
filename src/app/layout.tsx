@@ -25,9 +25,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={`${inter.variable} ${spaceGrotesk.variable} h-full antialiased dark`}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground bg-[#0A0A0A]">
+      <body suppressHydrationWarning className="min-h-full flex flex-col bg-background text-foreground bg-[#0A0A0A]">
         {children}
       </body>
     </html>
