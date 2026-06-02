@@ -20,8 +20,6 @@ NutriFlow AI is a modern, high-conversion SaaS platform that takes your dietary 
 |--------------|----------------------|
 | ![Landing](./public/screenshots/landing.png) | ![Dashboard](./public/screenshots/dashboard.png) |
 
-*(Note: Create a `public/screenshots` folder and add `hero.png`, `landing.png`, and `dashboard.png` to display your app's actual images here!)*
-
 ## 🚀 Quick Start Guide
 
 Follow these steps to set up the project locally.
