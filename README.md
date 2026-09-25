@@ -2,6 +2,8 @@
 
 > Your intelligent nutrition agent powered by Gemini AI and integrated with Swiggy.
 
+[View the live application](https://nutriflowai.vercel.app)
+
 ![NutriFlow AI Hero](./public/screenshots/hero.png)
 
 NutriFlow AI is a modern, high-conversion SaaS platform that takes your dietary goals (macros, budget, preferences) and uses Google's Gemini AI to instantly generate optimized daily meal plans, complete with restaurant recommendations and cost breakdowns.
@@ -27,8 +29,8 @@ Follow these steps to set up the project locally.
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/yourusername/nutriflow-ai.git
-cd nutriflow-ai
+git clone https://github.com/ASHLIN-BIJU/NutriFlow-AI.git
+cd NutriFlow-AI
 ```
 
 ### 2. Install dependencies
