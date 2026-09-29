@@ -10,6 +10,7 @@ function AuthContent() {
   const searchParams = useSearchParams();
   const initialMode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
   const errorMessage = searchParams.get('error');
+  const infoMessage = searchParams.get('message');
   
   const [isLogin, setIsLogin] = useState(initialMode === 'login');
 
@@ -40,6 +41,7 @@ function AuthContent() {
             </p>
           </div>
 
+          {infoMessage && <div role="status" className="mb-6 p-3 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-200 text-sm">{infoMessage}</div>}
           {errorMessage && (
             <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center gap-2 text-red-400 text-sm">
               <AlertCircle className="w-4 h-4 shrink-0" />
@@ -91,14 +93,6 @@ function AuthContent() {
                 className="w-full bg-[#121212] border border-white/10 rounded-xl py-3 pl-12 pr-4 text-white outline-none focus:border-[#FF6B00]/50 transition-colors"
               />
             </div>
-
-            {isLogin && (
-              <div className="flex justify-end">
-                <button type="button" className="text-xs text-[#FF6B00] hover:text-[#FF7A1A] font-medium">
-                  Forgot Password?
-                </button>
-              </div>
-            )}
 
             <button
               type="submit"
