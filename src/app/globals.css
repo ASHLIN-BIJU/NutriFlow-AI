@@ -69,3 +69,5 @@ body {
 .animate-pulse-glow {
   animation: pulse-glow 3s infinite;
 }
+
+html, body { max-width: 100%; overflow-x: clip; }
