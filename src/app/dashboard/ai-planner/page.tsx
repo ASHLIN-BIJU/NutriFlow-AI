@@ -1,16 +1,13 @@
-/* eslint-disable react/no-unescaped-entities, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars, @next/next/no-img-element */
+
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { savePlan, type Plan } from "@/lib/plan";
 import { motion } from "framer-motion";
-import { Send, Bot, User, ChefHat, Sparkles, ShoppingBag, RotateCcw, Edit2, Save, ArrowRight } from "lucide-react";
+import { Send, Bot, User, ChefHat, Sparkles, Save, ArrowRight } from "lucide-react";
 
-type MealPlan = {
-  breakfast: { items: string; protein: string; calories: string; cost: string; restaurant: string; };
-  lunch: { items: string; protein: string; calories: string; cost: string; restaurant: string; };
-  dinner: { items: string; protein: string; calories: string; cost: string; restaurant: string; };
-  total: { calories: string; protein: string; cost: string; };
-} | null;
+type MealPlan = Plan | null;
 
 type Message = {
   role: string;
@@ -18,11 +15,15 @@ type Message = {
   plan: MealPlan;
 };
 
-export default function AIPlannerPage() {
+function AIPlannerContent() {
   const [prompt, setPrompt] = useState("");
+  const searchParams = useSearchParams();
+  const [saveStatus, setSaveStatus] = useState("");
+  useEffect(() => { const goal = searchParams.get("goal"); if (goal) setPrompt(goal); }, [searchParams]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const mealKeys: (keyof Pick<Plan, 'breakfast' | 'lunch' | 'dinner'>)[] = ['breakfast', 'lunch', 'dinner'];
   const examplePrompts = [
     "150g protein under ₹400",
     "Vegetarian fat loss plan",
@@ -38,6 +39,7 @@ export default function AIPlannerPage() {
     setMessages(prev => [...prev, userMsg]);
     setPrompt("");
     setIsLoading(true);
+    setSaveStatus("");
 
     try {
       const response = await fetch("/api/chat", {
@@ -52,15 +54,18 @@ export default function AIPlannerPage() {
         throw new Error(data.error || "Failed to generate plan");
       }
 
+      const mealKeys = ["breakfast", "lunch", "dinner"] as const;
+      if (typeof data.message !== "string" || !data.plan || !mealKeys.every(key =>
+        data.plan[key] && ["items", "calories", "protein", "cost", "restaurant"].every(field =>
+          typeof data.plan[key][field] === "string")
+      ) || !data.plan.total || !["calories", "protein", "cost"].every(field => typeof data.plan.total[field] === "string")) {
+        throw new Error("The generated plan was incomplete. Please try again.");
+      }
+      setMessages(prev => [...prev, { role: "ai", content: data.message, plan: data.plan }]);
+    } catch (error: unknown) {
       setMessages(prev => [...prev, {
         role: "ai",
-        content: data.message,
-        plan: data.plan
-      }]);
-    } catch (error: any) {
-      setMessages(prev => [...prev, {
-        role: "ai",
-        content: "I&apos;m sorry, I couldn&apos;t generate a plan right now. Please ensure your Gemini API key is configured. Error: " + (error.message || ""),
+        content: "Could not generate a plan right now. Try again in a moment. Error: " + (error instanceof Error ? error.message : "Unknown error"),
         plan: null
       }]);
     } finally {
@@ -82,7 +87,7 @@ export default function AIPlannerPage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass border border-white/10 mb-8 text-sm font-medium text-[#FF7A1A]">
             <Sparkles className="w-4 h-4" />
-            <span>Powered by Swiggy AI Integrations</span>
+            <span>AI meal-planning prototype</span>
           </div>
 
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 font-sans text-white">
@@ -90,7 +95,7 @@ export default function AIPlannerPage() {
           </h1>
           
           <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Tell us your goals. We'll plan, optimize, and order your meals automatically using the best restaurants near you.
+            Tell us your goals and budget. Review a suggested day of meals with estimated nutrition and costs.
           </p>
 
           <div className="max-w-2xl mx-auto mb-8 relative group">
@@ -102,12 +107,12 @@ export default function AIPlannerPage() {
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                 placeholder="I need 100g protein daily under ₹250..." 
-                className="flex-1 bg-transparent border-none outline-none text-lg text-white placeholder-gray-500 h-14"
+                className="min-w-0 flex-1 bg-transparent border-none outline-none text-base sm:text-lg text-white placeholder-gray-500 h-14"
               />
               <button 
                 onClick={handleSend}
                 disabled={isLoading}
-                className="h-12 px-6 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FF7A1A] text-white font-semibold flex items-center justify-center gap-2 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
+                className="h-12 px-3 sm:px-6 rounded-xl bg-gradient-to-r from-[#FF6B00] to-[#FF7A1A] text-white font-semibold flex items-center justify-center gap-2 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? <span className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <>Generate <ArrowRight className="w-5 h-5" /></>}
               </button>
@@ -131,16 +136,16 @@ export default function AIPlannerPage() {
   }
 
   return (
-    <div className="flex flex-col h-full max-w-5xl mx-auto bg-[#0A0A0A]">
+    <div className="flex flex-col h-full min-w-0 max-w-5xl mx-auto bg-[#0A0A0A]">
       {/* Header */}
       <div className="pb-6 mb-6 border-b border-white/5 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white mb-1">AI Nutrition Planner</h1>
-          <p className="text-gray-400 text-sm">Design your perfect meal plan via Swiggy</p>
+          <p className="text-gray-400 text-sm">Draft meals for a goal and budget. Estimates need checking.</p>
         </div>
-        <div className="glass px-4 py-2 rounded-xl flex items-center gap-2">
+        <div className="hidden sm:flex glass px-4 py-2 rounded-xl items-center gap-2">
           <Sparkles className="w-4 h-4 text-[#FF6B00]" />
-          <span className="text-sm font-medium">GPT-4o Powered</span>
+          <span className="text-sm font-medium">Gemini-generated suggestions</span>
         </div>
       </div>
 
@@ -159,7 +164,7 @@ export default function AIPlannerPage() {
               {msg.role === 'user' ? <User className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-white" />}
             </div>
             
-            <div className={`flex flex-col gap-3 ${msg.role === 'user' ? 'items-end' : ''}`}>
+            <div className={`flex min-w-0 flex-col gap-3 ${msg.role === 'user' ? 'items-end' : ''}`}>
               <div className={`p-4 rounded-2xl text-sm leading-relaxed ${
                 msg.role === 'user' ? 'bg-[#FF6B00] text-white rounded-tr-sm' : 'glass rounded-tl-sm text-gray-200'
               }`}>
@@ -167,24 +172,24 @@ export default function AIPlannerPage() {
               </div>
 
               {msg.plan && (
-                <div className="glass-orange p-6 rounded-2xl w-full md:min-w-[500px]">
+                <div className="glass-orange p-4 sm:p-6 rounded-2xl w-full max-w-full sm:min-w-[500px]">
                   <div className="flex items-center gap-2 mb-6 text-[#FF6B00]">
                     <ChefHat className="w-5 h-5" />
                     <h3 className="font-semibold">Recommended Meal Plan</h3>
                   </div>
 
                   <div className="space-y-4 mb-6">
-                    {['breakfast', 'lunch', 'dinner'].map((mealTime) => (
+                    {mealKeys.map((mealTime) => (
                       <div key={mealTime} className="bg-[#121212] p-4 rounded-xl border border-white/5">
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="font-medium text-white capitalize">{mealTime}</h4>
-                          <span className="text-[#FF6B00] font-bold text-sm">{(msg.plan as any)[mealTime].cost}</span>
+                          <span className="text-[#FF6B00] font-bold text-sm">{msg.plan![mealTime].cost}</span>
                         </div>
-                        <p className="text-sm text-gray-400 mb-3">{(msg.plan as any)[mealTime].items}</p>
-                        <div className="flex gap-4 text-xs font-mono text-gray-500">
-                          <span className="bg-white/5 px-2 py-1 rounded">{(msg.plan as any)[mealTime].calories} kcal</span>
-                          <span className="bg-white/5 px-2 py-1 rounded">{(msg.plan as any)[mealTime].protein} protein</span>
-                          <span className="bg-white/5 px-2 py-1 rounded">via {(msg.plan as any)[mealTime].restaurant}</span>
+                        <p className="text-sm text-gray-400 mb-3">{msg.plan![mealTime].items}</p>
+                        <div className="flex flex-wrap gap-2 text-xs font-mono text-gray-500">
+                          <span className="bg-white/5 px-2 py-1 rounded">{msg.plan![mealTime].calories}</span>
+                          <span className="bg-white/5 px-2 py-1 rounded">{msg.plan![mealTime].protein} protein</span>
+                          <span className="bg-white/5 px-2 py-1 rounded">suggested: {msg.plan![mealTime].restaurant}</span>
                         </div>
                       </div>
                     ))}
@@ -205,20 +210,9 @@ export default function AIPlannerPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
-                    <button className="flex-1 bg-white text-black font-semibold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-gray-100 transition-colors">
-                      <ShoppingBag className="w-4 h-4" />
-                      Order via Swiggy
-                    </button>
-                    <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors tooltip tooltip-top" data-tip="Save Plan">
-                      <Save className="w-4 h-4 text-gray-300" />
-                    </button>
-                    <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors tooltip tooltip-top" data-tip="Edit">
-                      <Edit2 className="w-4 h-4 text-gray-300" />
-                    </button>
-                    <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl transition-colors tooltip tooltip-top" data-tip="Regenerate">
-                      <RotateCcw className="w-4 h-4 text-gray-300" />
-                    </button>
+                  <div className="space-y-2">
+                    <button onClick={() => { savePlan({ prompt: messages.slice(0, i).reverse().find(m => m.role === 'user')?.content || 'Meal plan', plan: msg.plan!, savedAt: new Date().toISOString() }); setSaveStatus('Saved in this browser'); }} className="bg-[#c5e78b] text-[#182310] font-semibold py-3 px-4 rounded-xl text-sm flex items-center gap-2"><Save className="w-4 h-4"/>Save plan</button>
+                    <p role="status" className="text-xs text-stone-400">{saveStatus || 'Restaurant names, nutrition and costs are AI estimates. No ordering is connected.'}</p>
                   </div>
                 </div>
               )}
@@ -263,10 +257,12 @@ export default function AIPlannerPage() {
               onChange={(e) => setPrompt(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSend()}
               placeholder="Describe your food goals..." 
-              className="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-600 h-12 text-sm"
+              className="min-w-0 flex-1 bg-transparent border-none outline-none text-white placeholder-gray-600 h-12 text-sm"
             />
             <button 
               onClick={handleSend}
+              disabled={isLoading || !prompt.trim()}
+              aria-label="Generate meal plan"
               className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${
                 prompt.trim() 
                   ? "bg-[#FF6B00] text-white hover:bg-[#FF7A1A]" 
@@ -281,3 +277,5 @@ export default function AIPlannerPage() {
     </div>
   );
 }
+
+export default function AIPlannerPage() { return <Suspense fallback={<div className="p-8">Loading planner...</div>}><AIPlannerContent /></Suspense> }
