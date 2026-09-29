@@ -13,8 +13,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "NutriFlow AI - Your AI Nutrition Agent",
-  description: "Tell us your goals. We'll plan, optimize, and order your meals automatically.",
+  title: "NutriFlow AI - Meal planning made simpler",
+  description: "Draft a day of meals from your goals and budget. Review AI-estimated nutrition and costs.",
 };
 
 export default function RootLayout({
