@@ -1,20 +1,20 @@
 # 🥗 NutriFlow AI
 
-> Your intelligent nutrition agent powered by Gemini AI and integrated with Swiggy.
+> A prototype for Gemini-assisted daily meal planning. No ordering or live restaurant integration.
 
 [View the live application](https://nutriflowai.vercel.app)
 
 ![NutriFlow AI Hero](./public/screenshots/hero.png)
 
-NutriFlow AI is a modern, high-conversion SaaS platform that takes your dietary goals (macros, budget, preferences) and uses Google's Gemini AI to instantly generate optimized daily meal plans, complete with restaurant recommendations and cost breakdowns.
+NutriFlow AI uses Gemini to draft one day of breakfast, lunch, and dinner ideas from a goal or budget. Nutrition and costs are AI estimates, not verified restaurant menus or live prices. Users can save the latest generated plan in their browser; it does not sync between devices.
 
 ## ✨ Features
 
 - **🧠 Intelligent Meal Planning**: Tell the AI your budget and macro goals (e.g., "150g protein under ₹400") and get a complete breakfast, lunch, and dinner plan.
 - **🔐 Secure Authentication**: Full email/password authentication and protected routes powered by Supabase Auth.
-- **⚡ Real-time AI Generation**: Lightning-fast structured JSON parsing powered by Google Generative AI (`gemini-flash-latest`).
-- **🎨 Premium Dark UI**: Stunning, glassmorphism-inspired dark mode interface built with Tailwind CSS and Framer Motion.
-- **📱 Fully Responsive**: Flawless experience across desktop, tablet, and mobile devices.
+- **⚡ Gemini generation**: The server requests a structured meal-plan draft from the Gemini API. A valid API key is needed.
+- **🎨 Dark UI**: Built with Tailwind CSS and Framer Motion.
+- **📱 Responsive layout**: Includes desktop and mobile navigation; test on your device before relying on it.
 
 ## 📸 Screenshots
 
@@ -52,7 +52,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 GEMINI_API_KEY=your_gemini_api_key
 ```
 
-*Note: For local testing, ensure Email Confirmation is disabled in your Supabase Auth settings to bypass the free-tier email limit.*
+*Email confirmation can stay enabled. Set the Supabase Auth Site URL and redirect allow list to the callback URL for your environment; verify that email sign-in returns to the app.*
 
 ### 4. Run the Development Server
 
@@ -64,7 +64,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/)
 - **Animations**: [Framer Motion](https://www.framer.com/motion/)
 - **Authentication**: [Supabase](https://supabase.com/)
