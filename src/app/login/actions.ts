@@ -35,10 +35,14 @@ export async function signup(formData: FormData) {
     }
   }
 
-  const { error } = await supabase.auth.signUp(data)
+  const { error, data: result } = await supabase.auth.signUp(data)
 
   if (error) {
     redirect('/login?mode=signup&error=' + encodeURIComponent(error.message))
+  }
+
+  if (!result.session) {
+    redirect('/login?message=' + encodeURIComponent('Check your email for a confirmation link. If you already have an account, sign in instead.'))
   }
 
   revalidatePath('/', 'layout')
